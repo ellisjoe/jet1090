@@ -1,5 +1,8 @@
 use rs1090::data::airports::{Airport, AIRPORTS};
 
+use crate::sensor::Sensor;
+use crate::snapshot::{Snapshot, StateVectors};
+use crate::SharedState;
 use axum::extract::{Query, State};
 use axum::http::StatusCode;
 use axum::response::sse::{Event, KeepAlive, Sse};
@@ -13,10 +16,6 @@ use std::convert::Infallible;
 use std::sync::Arc;
 use tokio::sync::broadcast::error::RecvError;
 use tower_http::cors::{Any, CorsLayer};
-
-use crate::sensor::Sensor;
-use crate::snapshot::{Snapshot, StateVectors};
-use crate::SharedState;
 
 /// Information required to ask for a trajectory
 #[derive(Deserialize)]
@@ -161,8 +160,13 @@ async fn home() -> Html<&'static str> {
         <li><a href=\"/sensors\">/sensors</a>: returns information about all sensors</li>\
         <li>/airports?q={string}: returns a list of potential airports matching the query string</li>\
         <li><a href=\"/stream\">/stream</a>: live feed of decoded messages as server-sent events</li>\
+        <li><a href=\"/map\">/map</a>: interactive map showing all aircraft</li>
         </ul>",
     )
+}
+
+async fn map() -> Html<&'static str> {
+    Html(include_str!("../static/map.html"))
 }
 
 /// Fallback handler for unknown routes
@@ -191,6 +195,7 @@ pub async fn serve_web_api(shared: Arc<SharedState>, port: u16) {
         .route("/sensors", get(sensors))
         .route("/airports", get(airports))
         .route("/stream", get(stream_messages))
+        .route("/map", get(map))
         .fallback(not_found)
         .with_state(shared)
         .layer(cors);
