@@ -270,6 +270,9 @@
             if (aircraft.registration) {
                 parts.push(`<tr><td>Registration:</td><td>${aircraft.registration}</td></tr>`);
             }
+            if (aircraft.callsign) {
+                parts.push(`<tr><td>Callsign:</td><td>${aircraft.callsign}</td></tr>`);
+            }
             if (aircraft.typecode) {
                 parts.push(`<tr><td>Type:</td><td>${aircraft.typecode}</td></tr>`);
             }
